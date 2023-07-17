@@ -1,10 +1,13 @@
-import yaml
 from pathlib import Path
 
+import yaml
+
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
+Chrome/102.0.5005.167 Safari/537.36"
 headers = {
     "headers": {
         "Referer": "https://www.tianditu.gov.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.167 Safari/537.36",
+        "User-Agent": USER_AGENT,
     }
 }
 
@@ -41,23 +44,25 @@ config = {
 }
 
 
-def get_tianditu_url(type: str, tk: str):
-    return f"https://t4.tianditu.gov.cn/{type}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER={type}&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TileCol=%(x)s&TileRow=%(y)s&TileMatrix=%(z)s&tk={tk}"
+def get_tianditu_url(map_type: str, token: str):
+    return f"https://t4.tianditu.gov.cn/{map_type}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER={map_type}&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TileCol=%(x)s&TileRow=%(y)s&TileMatrix=%(z)s&tk={token}"
 
 
-def new_sources(type: str, url: str, grid: str, transparent: bool, http: dict = None):
-    r = {"type": type, "url": url, "grid": grid, "transparent": transparent}
+def new_sources(
+    map_type: str, url: str, grid: str, transparent: bool, http: dict = None
+):
+    r = {"type": map_type, "url": url, "grid": grid, "transparent": transparent}
     if http:
         r["http"] = http
     return r
 
 
-def generate_config(tk: str):
+def generate_config(token: str):
     sources = {}
     caches = {}
     layers = []
 
-    for key in TianMapInfo.keys():
+    for key, _ in TianMapInfo.items():
         sources_name = f"tianditu_{key}"  # 也作为缓存文件名
         cache_name = f"tianditu_{key}_cache"
         transparent = False
@@ -65,7 +70,7 @@ def generate_config(tk: str):
             transparent = True
         sources[sources_name] = new_sources(
             "tile",
-            get_tianditu_url(key, tk),
+            get_tianditu_url(key, token),
             "GLOBAL_WEBMERCATOR",
             transparent,
             http=headers,
@@ -90,12 +95,14 @@ def generate_config(tk: str):
     return config
 
 
-def generate_yaml(tk):
-    print(f"使用tk: {tk}生成配置文件")
-    config = generate_config(tk)
-    y = yaml.dump(config, default_flow_style=False, sort_keys=False, allow_unicode=True)
-    with open("tianditu_mapproxy.yaml", "w", encoding="utf-8") as f:
-        f.write(y)
+def generate_yaml(token):
+    print(f"使用tk: {token}生成配置文件")
+    config_ = generate_config(token)
+    y = yaml.dump(
+        config_, default_flow_style=False, sort_keys=False, allow_unicode=True
+    )
+    with open("tianditu_mapproxy.yaml", "w", encoding="utf-8") as f1:
+        f1.write(y)
     print("生成配置文件 tianditu_mapproxy.yaml")
 
 
