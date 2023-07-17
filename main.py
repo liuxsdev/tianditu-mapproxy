@@ -45,7 +45,11 @@ config = {
 
 
 def get_tianditu_url(map_type: str, token: str):
-    return f"https://t4.tianditu.gov.cn/{map_type}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER={map_type}&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TileCol=%(x)s&TileRow=%(y)s&TileMatrix=%(z)s&tk={token}"
+    return (
+        f"https://t4.tianditu.gov.cn/{map_type}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0"
+        + f"&LAYER={map_type}&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&"
+        + f"TileCol=%(x)s&TileRow=%(y)s&TileMatrix=%(z)s&tk={token}"
+    )
 
 
 def new_sources(
