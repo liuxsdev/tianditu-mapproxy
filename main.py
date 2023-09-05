@@ -4,6 +4,7 @@ import yaml
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
 Chrome/102.0.5005.167 Safari/537.36"
+
 headers = {
     "headers": {
         "Referer": "https://www.tianditu.gov.cn/",
@@ -82,7 +83,11 @@ def generate_config(token: str):
         caches[cache_name] = {
             "grids": ["GLOBAL_WEBMERCATOR"],
             "sources": ["tianditu_" + key],
-            "cache": {"type": "geopackage", "filename": f"tianditu_{key}.gpkg"},
+            "cache": {
+                "type": "geopackage",
+                "table_name": key,
+                "filename": f"{TianMapInfo[key]}.gpkg",
+            },
         }
         layers.append(
             {
