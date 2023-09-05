@@ -15,7 +15,7 @@ mapproxy-util --version
 
 ## 生成 MapProxy 配置文件
 
-```shell
+```bash
 python main.py
 ```
 
